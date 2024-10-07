@@ -1,10 +1,54 @@
 module split_data_mod
   use kind_mod, only: dp
   use random, only: random_shuffle
+use change_point_util, only: change_points_neighbors
   implicit none
   private
-  public :: find_multiple_change_points, compute_test_stats_mcp
+  public :: find_multiple_change_points, compute_test_stats_mcp, optimize_change_points
 contains
+  !------------------------------------------------------------------------------
+  ! Subroutine: total_sse
+  !
+  ! Purpose:
+  !   Computes the total SSE given the data and a set of change points.
+  !
+  ! Arguments:
+  !   x          - Input data array (INTENT(IN))
+  !   change_cps - Array of change point locations (INTENT(IN))
+  !   sse_total  - Total SSE for the given partition (INTENT(OUT))
+  !------------------------------------------------------------------------------
+  subroutine total_sse(x, change_cps, sse_total)
+    real(dp), intent(in) :: x(:)
+    integer, intent(in) :: change_cps(:)
+    real(dp), intent(out) :: sse_total
+    integer :: i, K, n, start_cp, end_cp
+    real(dp) :: segment_mean, segment_sse
+
+    n = size(x)
+    K = size(change_cps)
+    sse_total = 0.0_dp
+
+    ! First segment: from 1 to the first change point
+    start_cp = 1
+    end_cp = change_cps(1)
+    call mean_and_sse(x(start_cp:end_cp), segment_mean, segment_sse)
+    sse_total = sse_total + segment_sse
+
+    ! Intermediate segments
+    do i = 2, K
+      start_cp = change_cps(i - 1) + 1
+      end_cp = change_cps(i)
+      call mean_and_sse(x(start_cp:end_cp), segment_mean, segment_sse)
+      sse_total = sse_total + segment_sse
+    end do
+
+    ! Last segment: from last change point to the end
+    start_cp = change_cps(K) + 1
+    if (start_cp <= n) then
+      call mean_and_sse(x(start_cp:n), segment_mean, segment_sse)
+      sse_total = sse_total + segment_sse
+    end if
+  end subroutine total_sse
   !------------------------------------------------------------------------------
   ! Subroutine: mean_and_sse
   !
@@ -204,4 +248,53 @@ end subroutine sort_integers
     end do
     p_value = real(count + 1, kind=dp) / real(n_perm + 1, kind=dp)
   end subroutine compute_test_stats_mcp
+!
+  !------------------------------------------------------------------------------
+  ! Subroutine: optimize_change_points
+  !
+  ! Purpose:
+  !   Iteratively finds the best neighbor in terms of total SSE, starting from an
+  !   initial guess, and stops when no neighboring set of change points provides
+  !   a lower SSE.
+  !
+  ! Arguments:
+  !   x               - Input data array (INTENT(IN))
+  !   initial_cps      - Initial guess of change points (INTENT(IN))
+  !   optimized_cps    - Optimized change points with lowest SSE (INTENT(OUT))
+  !------------------------------------------------------------------------------
+  subroutine optimize_change_points(x, initial_cps, optimized_cps)
+    real(dp), intent(in) :: x(:)
+    integer, intent(in) :: initial_cps(:)
+    integer, intent(out) :: optimized_cps(:)
+    integer, allocatable :: neighbor_cps(:,:)
+    integer :: num_neighbors, i
+    real(dp) :: current_sse, neighbor_sse
+    integer :: best_neighbor_idx
+    logical :: improvement
+    ! Initialize with the initial guess of change points
+    optimized_cps = initial_cps
+    call total_sse(x, optimized_cps, current_sse)
+    improvement = .true.
+    ! Iterate until no better neighbor is found
+    do while (improvement)
+      improvement = .false.
+      ! Generate neighboring sets of change points
+      neighbor_cps = change_points_neighbors(optimized_cps, size(x))
+      num_neighbors = size(neighbor_cps, 1)
+      ! Check all neighbors to find the one with the lowest SSE
+      do i = 1, num_neighbors
+        call total_sse(x, neighbor_cps(i,:), neighbor_sse)
+        if (neighbor_sse < current_sse) then
+          current_sse = neighbor_sse
+          best_neighbor_idx = i
+          improvement = .true.
+        end if
+      end do
+      ! Update the optimized change points if a better neighbor was found
+      if (improvement) then
+        optimized_cps = neighbor_cps(best_neighbor_idx, :)
+      end if
+      if (allocated(neighbor_cps)) deallocate(neighbor_cps)
+    end do
+  end subroutine optimize_change_points
 end module split_data_mod
