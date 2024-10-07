@@ -7,7 +7,8 @@ gfortran kind.f90 random.f90 change_point_util.f90 split_data.f90 xxsplit_data.f
 gfortran kind.f90 random.f90 change_point_util.f90 split_data.f90 xoptimize_change_points.f90
 gfortran change_point_util.f90 xneighbors.f90
 ```
-The output of running `xxsplit_data.f90` is
+The output of running `xxsplit_data.f90` is below. The Estimated Change Points are usually close to
+the True Change Points.
 ```
  #obs:        1000
  True Change Points:         100         200         700
