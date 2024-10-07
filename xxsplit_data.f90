@@ -43,6 +43,7 @@ program test_split_data
   do i = 1, nchanges + 1
     segment_means(i) = 5.0_dp + mean_chg * (i - 1)
   end do
+  print*,"#obs:", n
   print*, "True Change Points:", true_change_points
   print "(a20, *(1x,f0.4))", "Segment Means:", segment_means
   do iset=1, ndata_sets
