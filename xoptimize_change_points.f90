@@ -1,7 +1,6 @@
 program test_optimize_change_points
   use random, only: random_normal
   use split_data_mod, only: optimize_change_points
-!  use change_point_util, only: optimize_change_points
   implicit none
   integer, parameter :: dp = kind(1.0d0), n = 150, ncp = 2, &
                         true_cps(ncp) = [61, 101], nsets = 5
