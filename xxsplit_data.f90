@@ -13,7 +13,7 @@ program test_split_data
   !   - Outputs the results, including change points, means, total SSE, and p-value.
   !------------------------------------------------------------------------------
   use split_data_mod, only: find_multiple_change_points, compute_test_stats_mcp
-  use random, only: random_normal, random_seed_init
+  use random_mod    , only: random_normal, random_seed_init
   implicit none
   integer, parameter :: dp = kind(1.0d0)
   integer, parameter :: n = 1000, nchanges = 3, nregions = nchanges + 1, &
