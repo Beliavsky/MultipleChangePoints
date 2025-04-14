@@ -50,6 +50,7 @@ program xsegmentation
         allocate(cp_est(k))
         call find_change_points(x, cp_est, best_ll)
         write(*,"(I2,3X,F12.4,3X)", advance="no") k, best_ll
+        write "(*(i4))", cp_est
         ! Print each detected change point in the candidate.
         do i = 1, k
            write(*,"(I4)", advance="no") cp_est(i)
