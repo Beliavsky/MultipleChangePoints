@@ -37,6 +37,7 @@ program xsegmentation
   print "(/,a)", " k   Log-Likelihood   Detected Change Points"
   ! Loop over models with k = 0 to k_max change points.
   if (print_times) allocate (times(0:k_max+1))
+  allocate (cp_est(k_max))
   do k = 0, k_max
      if (print_times) call cpu_time(times(k))
      if (k == 0) then
@@ -45,18 +46,10 @@ program xsegmentation
         sumsq = sum(x(1:n)**2)
         if (sumsq <= 0.0_dp) sumsq = 1.0e-10_dp
         ll = -0.5_dp * nseg * (1.0_dp + log(sumsq/nseg))
-        write(*,"(I2,3X,F12.4,5X,A)") k, ll
+        write(*,"(I2,3X,F12.4)") k, ll
      else
-        allocate(cp_est(k))
-        call find_change_points(x, cp_est, best_ll)
-        write(*,"(I2,3X,F12.4,3X)", advance="no") k, best_ll
-        write "(*(i4))", cp_est
-        ! Print each detected change point in the candidate.
-        do i = 1, k
-           write(*,"(I4)", advance="no") cp_est(i)
-        end do
-        write(*,*)
-        deallocate(cp_est)
+        call find_change_points(x, cp_est(:k), best_ll)
+        write(*,"(I2,3X,F12.4,3X,*(i4))") k, best_ll, cp_est(:k)
      end if
   end do
   if (print_times) then
