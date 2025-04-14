@@ -1,5 +1,5 @@
 # MultipleChangePoints
-Simulate a Gaussian time series with several changes in the mean (changepoints) and identify them
+Simulate a Gaussian time series with several changes in the mean or standard deviation (changepoints) and identify them
 
 Compile the programs with
 ```
