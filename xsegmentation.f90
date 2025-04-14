@@ -12,12 +12,12 @@ program xsegmentation
   implicit none
 
   integer, parameter :: n = 200    ! # of observations
-  integer, parameter :: k_true = 2 ! True number of change points in the simulation
+  integer, parameter :: k_true = 3 ! True number of change points in the simulation
   integer, parameter :: k_max = 4  ! Maximum number of change points to test
   real(kind=dp) :: x(n), xsq(n)
-  integer :: i, k, nseg
-  integer, parameter :: cp_true(k_true) = [50, 150]
-  real(kind=dp), parameter :: sigma(k_true+1) = [1.0_dp, 5.0_dp, 1.0_dp]
+  integer :: i, isig, j, k, nseg
+  integer, parameter :: cp_true(k_true) = [50, 100, 150]
+  real(kind=dp), parameter :: sigma(k_true+1) = [3.0_dp, 5.0_dp, 1.0_dp, 10.0_dp]
   real(kind=dp), allocatable :: times(:)
   ! For storing the estimated change points for each model with k>0
   integer, allocatable :: cp_est(:)
@@ -25,13 +25,14 @@ program xsegmentation
   logical, parameter :: print_times = .true.
   print "('#obs: ', i0)", n
   do i = 1, n
-     if (i <= cp_true(1)) then
-        x(i) = sigma(1) * random_normal()
-     else if (i <= cp_true(2)) then
-        x(i) = sigma(2) * random_normal()
-     else
-        x(i) = sigma(3) * random_normal()
-     end if
+     isig = k_true + 1
+     do j=1,k_true
+        if (i <= cp_true(j)) then
+           isig = j
+           exit
+        end if
+     end do
+     x(i) = sigma(isig) * random_normal()
   end do
   xsq = x**2
   print "(/,a30,*(i6))", "True ChangePoints (indices):", cp_true
