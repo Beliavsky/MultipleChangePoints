@@ -1,6 +1,6 @@
 module split_data_mod
   use kind_mod, only: dp
-  use random, only: random_shuffle
+  use random_mod, only: random_shuffle
 use change_point_util, only: change_points_neighbors
   implicit none
   private
