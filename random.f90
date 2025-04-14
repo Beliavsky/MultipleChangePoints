@@ -1,10 +1,11 @@
 module random_mod
-!     Author: Alan Miller
+! Author: Alan Miller
+use constants_mod, only: pi, half
 implicit none
 private
 public :: random_shuffle, random_normal, random_seed_init
 integer, parameter :: dp = selected_real_kind(12, 60), sp = kind(1.0)
-real(kind=dp), parameter :: pi = 3.141592653589793D0, half_pi = pi/2, half = 0.5_dp
+! real(kind=dp), parameter :: pi = 3.141592653589793D0, half = 0.5_dp
 interface random_normal
    module procedure random_normal_scalar,random_normal_vec
 end interface
