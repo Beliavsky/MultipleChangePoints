@@ -2,9 +2,10 @@ module constants_mod
 use kind_mod, only: dp
 implicit none
 private
-public :: pi, pi_over_2, log_two_pi, log_two, sqrt_two, &
+public :: half, pi, pi_over_2, log_two_pi, log_two, sqrt_two, &
    one_over_sqrt_two_pi, pi_over_4, two_over_pi, dpmpar
 real(kind=dp), parameter :: &
+   half       = 0.5_dp, &
    pi         = 3.141592653589793238462643_dp, &
    pi_over_2  = pi/2.0_dp, &
    pi_over_4  = pi/4.0_dp, &
