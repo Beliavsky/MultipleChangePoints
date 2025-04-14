@@ -1,4 +1,4 @@
-module random
+module random_mod
 !     Author: Alan Miller
 implicit none
 private
@@ -108,4 +108,4 @@ subroutine random_seed_init(iseed)
   call random_seed(put=seed)
 end subroutine random_seed_init
 
-end module random
+end module random_mod
