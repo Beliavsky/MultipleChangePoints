@@ -11,19 +11,19 @@ program xsegmentation
   use random_mod      , only: random_normal
   implicit none
 
-  integer, parameter :: n = 400    ! # of observations
+  integer, parameter :: n = 200    ! # of observations
   integer, parameter :: k_true = 2 ! True number of change points in the simulation
-  integer, parameter :: k_max = 3  ! Maximum number of change points to test
+  integer, parameter :: k_max = 4  ! Maximum number of change points to test
   real(kind=dp) :: x(n), xsq(n)
   integer :: i, k, nseg
-  integer, parameter :: cp_true(k_true) = [30, 70]
-  real(kind=dp), parameter :: sigma(k_true+1) = [1.0_dp, 5.0_dp, 0.2_dp]
+  integer, parameter :: cp_true(k_true) = [50, 150]
+  real(kind=dp), parameter :: sigma(k_true+1) = [1.0_dp, 5.0_dp, 1.0_dp]
   real(kind=dp), allocatable :: times(:)
   ! For storing the estimated change points for each model with k>0
   integer, allocatable :: cp_est(:)
   real(kind=dp) :: best_ll, ll, sumsq
   logical, parameter :: print_times = .true.
-
+  print "('#obs: ', i0)", n
   do i = 1, n
      if (i <= cp_true(1)) then
         x(i) = sigma(1) * random_normal()
@@ -34,8 +34,9 @@ program xsegmentation
      end if
   end do
   xsq = x**2
-  print "(/,a,*(1x,i0))", "True Change Points (indices):", cp_true
-  print "(/,a)", " k   Log-Likelihood   Detected Change Points"
+  print "(/,a30,*(i6))", "True ChangePoints (indices):", cp_true
+  print "(a30,*(f6.2))", "True SD:", sigma
+  print "(/,a)", " k   Log-Likelihood  Estimated-ChangePoints"
   ! Loop over models with k = 0 to k_max change points.
   if (print_times) allocate (times(0:k_max+1))
   allocate (cp_est(k_max))
